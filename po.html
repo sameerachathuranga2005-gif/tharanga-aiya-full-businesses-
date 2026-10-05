@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Green Light Enterprises - Official Purchase Order Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Great+Vibes&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="po.css">
+  <script src="auth.js"></script>
+  <script>enforceGleProtection();</script>
+</head>
+<body>
+
+  <!-- Top Action Bar (hidden on print) -->
+  <header class="app-toolbar no-print">
+    <div class="toolbar-brand">
+      <div class="toolbar-logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3">
+          <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+          <line x1="3" y1="6" x2="21" y2="6"/>
+          <path d="M16 10a4 4 0 0 1-8 0"/>
+        </svg>
+      </div>
+      <div>
+        <h1 class="toolbar-title">GLE Purchase Order Studio Pro</h1>
+        <p class="toolbar-subtitle">Click ANY text directly to edit • Executive Commercial PO & Procurement Engine</p>
+      </div>
+    </div>
+
+    <div class="toolbar-actions">
+      <!-- Navigation Links -->
+      <a href="intro page.html" class="btn btn-secondary" title="Return to Intro Page">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span>Intro</span>
+      </a>
+
+      <a href="1.html" class="btn btn-secondary" title="Switch to 1-Item Quotation">
+        <span>1 Item</span>
+      </a>
+
+      <a href="2.html" class="btn btn-secondary" title="Switch to 2-Item Quotation">
+        <span>2 Items</span>
+      </a>
+
+      <a href="3.html" class="btn btn-secondary" title="Switch to 3-Item Quotation">
+        <span>3 Items</span>
+      </a>
+
+      <a href="invoice.html" class="btn btn-secondary" title="Switch to Official Invoice Studio">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        <span>Invoice</span>
+      </a>
+
+      <button onclick="gleLock()" class="btn btn-secondary" title="Lock Studio and Sign Out">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <span>Lock</span>
+      </button>
+
+      <!-- Document Type Selector -->
+      <div class="toolbar-dropdown-wrap">
+        <button id="docTypeMenuBtn" class="btn btn-secondary" title="Switch P.O. purpose and title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 7h10"/><path d="M7 12h10"/><path d="M7 17h6"/></svg>
+          <span>Doc: <strong id="docTypeLabel">Purchase Order</strong></span>
+        </button>
+        <div class="quick-items-popover doc-type-popover" id="docTypePopover">
+          <div class="popover-header">
+            <h4>Select Document Type</h4>
+            <button type="button" class="popover-close-btn" id="closeDocTypeBtn">&times;</button>
+          </div>
+          <button type="button" class="quick-item-btn" data-doctype="OFFICIAL PURCHASE ORDER" data-prefix="PO-">
+            <span class="item-name">Official Purchase Order</span>
+            <span class="item-desc">Standard corporate commercial procurement order</span>
+          </button>
+          <button type="button" class="quick-item-btn" data-doctype="BLANKET PURCHASE ORDER" data-prefix="BPO-">
+            <span class="item-name">Blanket Purchase Order</span>
+            <span class="item-desc">Long-term supply contract with staged release delivery</span>
+          </button>
+          <button type="button" class="quick-item-btn" data-doctype="MATERIAL REQUISITION ORDER" data-prefix="MRO-">
+            <span class="item-name">Material Requisition Order</span>
+            <span class="item-desc">Internal production & packaging raw material order</span>
+          </button>
+          <button type="button" class="quick-item-btn" data-doctype="URGENT PROCUREMENT ORDER" data-prefix="UPO-">
+            <span class="item-name">Urgent Procurement Order</span>
+            <span class="item-desc">Express delivery priority manufacturing order</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Item Catalog Dropdown -->
+      <div class="toolbar-dropdown-wrap">
+        <button id="quickItemsBtn" class="btn btn-success" title="Quickly add standard GLE packaging products">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+          <span>+ Add Product</span>
+        </button>
+        <div class="quick-items-popover" id="quickItemsPopover"></div>
+      </div>
+
+      <!-- Quick Clients & Vendors Dropdown -->
+      <div class="toolbar-dropdown-wrap">
+        <button id="clientsMenuBtn" class="btn btn-secondary" title="Select pre-saved client or vendor details">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <span>Parties</span>
+        </button>
+        <div class="quick-items-popover" id="clientsPopover"></div>
+      </div>
+
+      <!-- Highlight Edit Mode Toggle -->
+      <button id="toggleEditBtn" class="btn btn-secondary" title="Highlight all editable elements with dotted outlines">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        <span id="editBtnText">Show Outlines</span>
+      </button>
+
+      <!-- Tax / VAT Toggle -->
+      <div class="toolbar-dropdown-wrap">
+        <button id="taxMenuBtn" class="btn btn-secondary" title="Configure VAT or Government Levies">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <span>Tax: <strong id="taxRateLabel">Non-VAT (0%)</strong></span>
+        </button>
+        <div class="quick-items-popover" id="taxPopover">
+          <div class="popover-header">
+            <h4>Tax / VAT Options</h4>
+            <button type="button" class="popover-close-btn" id="closeTaxBtn">&times;</button>
+          </div>
+          <button type="button" class="quick-item-btn" data-tax="0" data-tax-label="Non-VAT (0%)">
+            <span class="item-name">No Tax / Non-VAT</span>
+            <span class="item-desc">Standard SME packaging supply without VAT</span>
+          </button>
+          <button type="button" class="quick-item-btn" data-tax="2.5" data-tax-label="SSCL (2.5%)">
+            <span class="item-name">SSCL (2.5%)</span>
+            <span class="item-desc">Social Security Contribution Levy</span>
+          </button>
+          <button type="button" class="quick-item-btn" data-tax="18" data-tax-label="VAT (18%)">
+            <span class="item-name">VAT (18%)</span>
+            <span class="item-desc">Standard Sri Lanka Value Added Tax</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Discount Picker -->
+      <div class="toolbar-dropdown-wrap">
+        <button id="discountMenuBtn" class="btn btn-secondary" title="Apply overall purchase order discount">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>
+          <span>Discount: <strong id="currentDiscountLabel">0%</strong></span>
+        </button>
+        <div class="quick-items-popover" id="discountPopover">
+          <div class="popover-header">
+            <h4>Apply Discount</h4>
+            <button type="button" class="popover-close-btn" id="closeDiscountBtn">&times;</button>
+          </div>
+          <button type="button" class="quick-item-btn" data-discount="0">
+            <span class="item-name">No Discount (0%)</span>
+          </button>
+          <button type="button" class="quick-item-btn" data-discount="2.5">
+            <span class="item-name">2.5% Goodwill Discount</span>
+          </button>
+          <button type="button" class="quick-item-btn" data-discount="5">
+            <span class="item-name">5% Bulk Order Discount</span>
+          </button>
+          <button type="button" class="quick-item-btn" data-discount="10">
+            <span class="item-name">10% Strategic Contract Partner Rate</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Feature Toggles Group -->
+      <button id="toggleShipToBtn" class="btn btn-secondary active" title="Show or hide Ship-To Delivery Address block">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+        <span>Ship-To</span>
+      </button>
+
+      <button id="toggleBankBtn" class="btn btn-secondary active" title="Show or hide vendor bank payment details">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+        <span>Bank</span>
+      </button>
+
+      <button id="toggleStampBtn" class="btn btn-secondary active" title="Show or hide official corporate procurement seal">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+        <span>Seal</span>
+      </button>
+
+      <button id="toggleSignatureBtn" class="btn btn-secondary active" title="Toggle authorized purchasing signature">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.5 4.5a2.121 2.121 0 0 1 3 3L7 21l-4 1 1-4L20.5 4.5z"/></svg>
+        <span>Signature</span>
+      </button>
+
+      <button id="toggleVendorAckBtn" class="btn btn-secondary active" title="Show or hide Vendor Order Acceptance & Acknowledgement box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="m19 11 2 2 4-4"/></svg>
+        <span>Vendor Ack.</span>
+      </button>
+
+      <!-- Document Icons & Terms Checkmarks Toggle / Customization Dropdown -->
+      <div class="toolbar-dropdown-wrap icon-toolbar-group">
+        <button id="toggleIconsBtn" class="btn btn-secondary active icon-split-main" title="Click to instantly toggle checkmarks & section icons On/Off">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+          <span>Icons: <strong id="iconsBtnLabel">On</strong></span>
+        </button>
+        <button id="iconsMenuBtn" class="btn btn-secondary icon-split-arrow" title="Checkmark & icon options (Bullets, Numbers, Clean text)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width: 10px; height: 10px;"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <div class="quick-items-popover icons-popover" id="iconsPopover" style="width: 290px;">
+          <div class="popover-header">
+            <h4>Checkmarks & Icons Control</h4>
+            <button type="button" class="popover-close-btn" id="closeIconsBtn">&times;</button>
+          </div>
+
+          <button type="button" class="quick-item-btn" id="popoverToggleAllIcons">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span class="item-name" id="popoverToggleAllTitle">✕ Hide All Icons</span>
+              <span class="icon-toggle-pill on" id="popoverToggleAllBadge">Active</span>
+            </div>
+            <span class="item-desc">Remove (i) info icon, acceptance checkmark, and list checkmarks</span>
+          </button>
+
+          <div class="popover-sub-header">Terms Bullet & Checkmark Style</div>
+          <button type="button" class="quick-item-btn icon-bullet-btn active" data-bullet="check">
+            <span class="item-name">✓ Green Checkmarks (Default)</span>
+            <span class="item-desc">GLE signature verified checkmarks</span>
+          </button>
+          <button type="button" class="quick-item-btn icon-bullet-btn" data-bullet="dot">
+            <span class="item-name">• Bullet Dots</span>
+            <span class="item-desc">Classic neat bullet points</span>
+          </button>
+          <button type="button" class="quick-item-btn icon-bullet-btn" data-bullet="dash">
+            <span class="item-name">– Minimalist Dashes</span>
+            <span class="item-desc">Modern subtle horizontal dashes</span>
+          </button>
+          <button type="button" class="quick-item-btn icon-bullet-btn" data-bullet="number">
+            <span class="item-name">1. 2. 3. Numbered Clauses</span>
+            <span class="item-desc">Sequential legal numbering for commercial terms</span>
+          </button>
+          <button type="button" class="quick-item-btn icon-bullet-btn" data-bullet="none">
+            <span class="item-name">∅ No Bullets / Clean Text</span>
+            <span class="item-desc">Completely plain text without any symbols</span>
+          </button>
+
+          <div class="popover-sub-header">Individual Heading Icons</div>
+          <button type="button" class="quick-item-btn" id="toggleTermsHeadingIcon">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span class="item-name">Purchasing Instructions (ⓘ) Icon</span>
+              <span class="icon-toggle-pill on" id="termsHeadingIconPill">Shown</span>
+            </div>
+            <span class="item-desc">Circle info icon next to Purchasing Terms</span>
+          </button>
+          <button type="button" class="quick-item-btn" id="toggleAckHeadingIcon">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span class="item-name">Vendor Acceptance (✓) Icon</span>
+              <span class="icon-toggle-pill on" id="ackHeadingIconPill">Shown</span>
+            </div>
+            <span class="item-desc">Blue checkmark icon next to Order Acknowledgement</span>
+          </button>
+          <button type="button" class="quick-item-btn" id="toggleBankHeadingIcon">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span class="item-name">Bank Card Icon</span>
+              <span class="icon-toggle-pill on" id="bankHeadingIconPill">Shown</span>
+            </div>
+            <span class="item-desc">Card icon next to Bank Payment Details</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Spacing Menu -->
+      <div class="toolbar-dropdown-wrap">
+        <button id="spacingMenuBtn" class="btn btn-secondary" title="Adjust text gap, word spacing, and line height">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="4 7 4 4 20 4 20 7"/>
+            <line x1="9" y1="20" x2="15" y2="20"/>
+            <line x1="12" y1="4" x2="12" y2="20"/>
+          </svg>
+          <span>Text Gap: <strong id="currentGapLabel">Normal</strong></span>
+        </button>
+
+        <div class="spacing-popover" id="spacingPopover">
+          <div class="popover-header">
+            <h4>Text Gap & Spacing</h4>
+            <button type="button" class="popover-close-btn" id="closeSpacingBtn">&times;</button>
+          </div>
+
+          <div class="spacing-control-group">
+            <div class="control-label-row">
+              <label for="wordSpacingSlider">Word Gap (වචන පරතරය)</label>
+              <span class="control-val-badge" id="wordGapVal">0.03em</span>
+            </div>
+            <input type="range" id="wordSpacingSlider" min="0" max="0.20" step="0.01" value="0.03">
+          </div>
+
+          <div class="spacing-control-group">
+            <div class="control-label-row">
+              <label for="lineHeightSlider">Line Spacing (පේළි පරතරය)</label>
+              <span class="control-val-badge" id="lineHeightVal">1.46</span>
+            </div>
+            <input type="range" id="lineHeightSlider" min="1.1" max="2.2" step="0.02" value="1.46">
+          </div>
+
+          <div class="spacing-control-group">
+            <div class="control-label-row">
+              <label for="letterSpacingSlider">Letter Tracking (අකුරු පරතරය)</label>
+              <span class="control-val-badge" id="letterGapVal">0.00em</span>
+            </div>
+            <input type="range" id="letterSpacingSlider" min="-0.03" max="0.10" step="0.005" value="0.00">
+          </div>
+
+          <!-- Boldness Weight Picker -->
+          <div class="spacing-control-group">
+            <div class="control-label-row">
+              <label>Text Boldness (අකුරු ඝනකම)</label>
+              <span class="control-val-badge" id="textWeightVal">Regular (400)</span>
+            </div>
+            <div class="weight-pills-row">
+              <button type="button" class="weight-pill active" data-weight="normal">Regular</button>
+              <button type="button" class="weight-pill" data-weight="medium">Medium</button>
+              <button type="button" class="weight-pill" data-weight="semibold">SemiBold</button>
+              <button type="button" class="weight-pill" data-weight="bold">Bold</button>
+            </div>
+          </div>
+
+          <!-- Presets -->
+          <div class="spacing-control-group">
+            <label style="font-size:0.75rem; color:var(--slate-400); margin-bottom:4px; font-weight:600;">Presets:</label>
+            <div class="preset-pills-row">
+              <button type="button" class="preset-pill" data-preset="compact">Compact</button>
+              <button type="button" class="preset-pill active" data-preset="normal">Normal</button>
+              <button type="button" class="preset-pill" data-preset="spacious">Spacious</button>
+              <button type="button" class="preset-pill" data-preset="wide">Wide</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section-by-Section Text Size Menu (කෑල්ලෙන් කෑල්ලට Text Size) -->
+      <div class="toolbar-dropdown-wrap">
+        <button id="sectionSizeMenuBtn" class="btn btn-secondary" title="කෑල්ලෙන් කෑල්ලට Text Size වෙනස් කරන්න (Section Font Sizer)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 19V7a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v12"/>
+            <path d="M4 12h8"/>
+            <path d="M15 19V11a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v8"/>
+            <path d="M15 15h7"/>
+          </svg>
+          <span>Text Size: <strong id="sectionSizeLabel">Custom (කෑලි)</strong></span>
+        </button>
+
+        <div class="quick-items-popover section-size-popover" id="sectionSizePopover" style="width: 330px;">
+          <div class="popover-header">
+            <div>
+              <h4 style="margin:0; font-size:0.83rem; font-weight:800; color:#fff;">Text Size (කෑල්ලෙන් කෑල්ලට)</h4>
+              <p style="margin:2px 0 0; font-size:0.69rem; color:var(--slate-400);">Section-by-section font size control</p>
+            </div>
+            <button type="button" class="popover-close-btn" id="closeSectionSizeBtn">&times;</button>
+          </div>
+
+          <div class="section-size-list">
+            <div class="section-size-row" data-sec="header-meta">
+              <span class="sec-name">🏢 Header & Dates (විස්තර)</span>
+              <div class="sec-ctrl-btns">
+                <button type="button" class="sec-btn-dec" title="කුඩා කරන්න">-</button>
+                <span class="sec-val-badge" id="val-header-meta">100%</span>
+                <button type="button" class="sec-btn-inc" title="විශාල කරන්න">+</button>
+              </div>
+            </div>
+
+            <div class="section-size-row" data-sec="parties">
+              <span class="sec-name">👤 Addresses (Buyer/Vendor)</span>
+              <div class="sec-ctrl-btns">
+                <button type="button" class="sec-btn-dec">-</button>
+                <span class="sec-val-badge" id="val-parties">100%</span>
+                <button type="button" class="sec-btn-inc">+</button>
+              </div>
+            </div>
+
+            <div class="section-size-row" data-sec="logistics">
+              <span class="sec-name">🚚 Freight & Terms Strip</span>
+              <div class="sec-ctrl-btns">
+                <button type="button" class="sec-btn-dec">-</button>
+                <span class="sec-val-badge" id="val-logistics">100%</span>
+                <button type="button" class="sec-btn-inc">+</button>
+              </div>
+            </div>
+
+            <div class="section-size-row" data-sec="table">
+              <span class="sec-name">📋 Items Table (භාණ්ඩ වගුව)</span>
+              <div class="sec-ctrl-btns">
+                <button type="button" class="sec-btn-dec">-</button>
+                <span class="sec-val-badge" id="val-table">100%</span>
+                <button type="button" class="sec-btn-inc">+</button>
+              </div>
+            </div>
+
+            <div class="section-size-row" data-sec="words">
+              <span class="sec-name">💰 Amount in Words</span>
+              <div class="sec-ctrl-btns">
+                <button type="button" class="sec-btn-dec">-</button>
+                <span class="sec-val-badge" id="val-words">100%</span>
+                <button type="button" class="sec-btn-inc">+</button>
+              </div>
+            </div>
+
+            <div class="section-size-row" data-sec="bank">
+              <span class="sec-name">🏛️ Bank Account Details</span>
+              <div class="sec-ctrl-btns">
+                <button type="button" class="sec-btn-dec">-</button>
+                <span class="sec-val-badge" id="val-bank">100%</span>
+                <button type="button" class="sec-btn-inc">+</button>
+              </div>
+            </div>
+
+            <div class="section-size-row" data-sec="terms">
+              <span class="sec-name">📝 Purchasing Terms (කොන්දේසි)</span>
+              <div class="sec-ctrl-btns">
+                <button type="button" class="sec-btn-dec">-</button>
+                <span class="sec-val-badge" id="val-terms">100%</span>
+                <button type="button" class="sec-btn-inc">+</button>
+              </div>
+            </div>
+
+            <div class="section-size-row" data-sec="totals">
+              <span class="sec-name">💵 Total PO Value Box</span>
+              <div class="sec-ctrl-btns">
+                <button type="button" class="sec-btn-dec">-</button>
+                <span class="sec-val-badge" id="val-totals">100%</span>
+                <button type="button" class="sec-btn-inc">+</button>
+              </div>
+            </div>
+
+            <div class="section-size-row" data-sec="signatures">
+              <span class="sec-name">✍️ Signatures & Acceptance</span>
+              <div class="sec-ctrl-btns">
+                <button type="button" class="sec-btn-dec">-</button>
+                <span class="sec-val-badge" id="val-signatures">100%</span>
+                <button type="button" class="sec-btn-inc">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="popover-sub-header">All Sections Presets (සියල්ල)</div>
+          <div class="preset-pills-row" style="margin-bottom: 6px;">
+            <button type="button" class="preset-pill sec-preset-pill" data-all-scale="0.88">Small (කුඩා)</button>
+            <button type="button" class="preset-pill sec-preset-pill active" data-all-scale="1.0">Normal</button>
+            <button type="button" class="preset-pill sec-preset-pill" data-all-scale="1.12">Large (විශාල)</button>
+            <button type="button" class="preset-pill sec-preset-pill" data-all-scale="1.25">XL</button>
+          </div>
+
+          <button type="button" class="btn btn-ghost btn-sm" id="resetAllSectionSizesBtn" style="width: 100%; border: 1px solid rgba(255,255,255,0.12); color: #cbd5e1; justify-content: center;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+            <span>Reset All to Default (100%)</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Theme Switcher -->
+      <button id="themeToggleBtn" class="btn btn-secondary" title="Cycle luxury color accents">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+        <span>Theme: <strong id="currentThemeName">Emerald GLE</strong></span>
+      </button>
+
+      <!-- Status Watermark Cycle Button -->
+      <button id="statusStampBtn" class="btn btn-secondary" title="Cycle watermark stamp (None / APPROVED / ISSUED / PENDING / CONFIRMED)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 14 14"/></svg>
+        <span>Stamp: <strong id="statusStampLabel">None</strong></span>
+      </button>
+
+      <!-- Next PO Increment Button -->
+      <button id="nextPoBtn" class="btn btn-secondary" title="Increment PO number automatically">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        <span>Next PO #</span>
+      </button>
+
+      <!-- JSON Export/Import -->
+      <button id="exportJsonBtn" class="btn btn-secondary" title="Save current PO data to a JSON backup file">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <span>Backup JSON</span>
+      </button>
+
+      <label class="btn btn-secondary" title="Load PO data from a JSON file" style="cursor: pointer; margin: 0;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        <span>Restore</span>
+        <input type="file" id="importJsonInput" accept=".json" style="display: none;">
+      </label>
+
+      <!-- Reset Template Button -->
+      <button id="resetBtn" class="btn btn-secondary" title="Reset all fields to template defaults">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+        <span>Reset</span>
+      </button>
+
+      <!-- Print Button -->
+      <button id="printBtn" class="btn btn-primary" title="Print or save as professional PDF">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        <span>Print / PDF</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Document Viewport Centering -->
+  <main class="page-viewport">
+    
+    <!-- Official A4 Document Page (Exact Dimensions: 210mm x 297mm) -->
+    <article class="a4-sheet theme-emerald" id="poDoc">
+
+      <!-- Top Stripe Accent matching official document -->
+      <div class="top-stripe-accent" aria-hidden="true"></div>
+
+      <!-- Main PO Document Content Wrapper -->
+      <div class="po-body-wrapper">
+
+        <!-- Watermark Status Stamp (Hidden by default for simple clean look) -->
+        <div class="po-status-stamp" id="statusStamp" style="display: none;">APPROVED</div>
+
+        <!-- 1. Header Section (Logo + PO Title & Metadata) -->
+        <header class="po-header">
+          <div class="po-brand-left">
+            <img src="logo.png" alt="Green Light Enterprises Logo" class="po-brand-logo">
+            <div class="brand-subtext">
+              <span class="brand-tagline" contenteditable="true" spellcheck="false" data-key="brandTagline">Stretch Film • Industrial Packaging Solutions</span>
+              <span class="brand-reg" contenteditable="true" spellcheck="false" data-key="brandReg">Business Reg No: PV/W 0029381 • TIN: 104829192</span>
+            </div>
+          </div>
+
+          <div class="po-title-meta-right">
+            <div class="title-status-row">
+              <h1 class="po-main-heading" id="docTypeHeading" contenteditable="true" spellcheck="false">OFFICIAL PURCHASE ORDER</h1>
+              <!-- Interactive Status Badge Pill -->
+              <span class="po-status-pill status-approved" id="headerStatusPill" title="Click to cycle order status">
+                <span class="status-dot"></span>
+                <span id="headerStatusText" contenteditable="true" spellcheck="false">APPROVED</span>
+              </span>
+            </div>
+
+            <div class="po-meta-card">
+              <div class="section-size-ctrl no-print" data-section="header-meta" title="Header Dates Text Size">
+                <button type="button" class="sec-ctrl-btn dec" title="කුඩා කරන්න (A-)">A-</button>
+                <span class="sec-ctrl-val">100%</span>
+                <button type="button" class="sec-ctrl-btn inc" title="විශාල කරන්න (A+)">A+</button>
+                <button type="button" class="sec-ctrl-btn reset" title="Reset">↺</button>
+              </div>
+              <div class="meta-row">
+                <span class="meta-label" contenteditable="true" spellcheck="false">P.O. Number:</span>
+                <span class="meta-val highlight-po" contenteditable="true" spellcheck="false" data-key="poNumber">PO-2026-088</span>
+              </div>
+              <div class="meta-row">
+                <span class="meta-label" contenteditable="true" spellcheck="false">Order Date:</span>
+                <span class="meta-val" contenteditable="true" spellcheck="false" data-key="poDate">05 October 2026</span>
+              </div>
+              <div class="meta-row">
+                <span class="meta-label" contenteditable="true" spellcheck="false">Delivery Due:</span>
+                <span class="meta-val" contenteditable="true" spellcheck="false" data-key="poDueDate">12 October 2026</span>
+              </div>
+              <div class="meta-row" id="quoteRefRow">
+                <span class="meta-label" contenteditable="true" spellcheck="false">Quotation Ref:</span>
+                <span class="meta-val" contenteditable="true" spellcheck="false" data-key="quoteRef">GLE-QT-2026-104</span>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <!-- Divider Line -->
+        <div class="header-divider-line"></div>
+
+        <!-- 2. Commercial Order Parties Grid (Issued By Purchaser, Vendor Supplier, and Ship-To Address) -->
+        <section class="po-parties-grid" id="partiesGrid">
+          <div class="section-size-ctrl no-print" data-section="parties" title="Parties / Address Text Size">
+            <button type="button" class="sec-ctrl-btn dec" title="කුඩා කරන්න (A-)">A-</button>
+            <span class="sec-ctrl-val">100%</span>
+            <button type="button" class="sec-ctrl-btn inc" title="විශාල කරන්න (A+)">A+</button>
+            <button type="button" class="sec-ctrl-btn reset" title="Reset">↺</button>
+          </div>
+          
+          <!-- Issued By (Purchaser / Buyer) Column -->
+          <div class="party-block party-buyer">
+            <div class="party-label-wrap">
+              <div class="party-icon-dot buyer-dot"></div>
+              <span class="party-label" contenteditable="true" spellcheck="false">ISSUED BY (BUYER / PURCHASER)</span>
+            </div>
+            <div class="party-name" contenteditable="true" spellcheck="false" data-key="buyerCompany">Dilmin Enterprise</div>
+            <div class="party-attn" contenteditable="true" spellcheck="false" data-key="buyerAttn">Attn: Procurement & Stores Dept</div>
+            <div class="party-line" contenteditable="true" spellcheck="false" data-key="buyerAddress1">Katupotha Rd., Moonamaldeniya</div>
+            <div class="party-line" contenteditable="true" spellcheck="false" data-key="buyerAddress2">North Western Province, Sri Lanka</div>
+            <div class="party-line" contenteditable="true" spellcheck="false" data-key="buyerContact">Tel: 077 412 8930 | Email: dilmin.procure@gmail.com</div>
+          </div>
+
+          <!-- Vendor / Supplier (Ordered From) Column -->
+          <div class="party-block party-vendor">
+            <div class="party-label-wrap">
+              <div class="party-icon-dot vendor-dot"></div>
+              <span class="party-label" contenteditable="true" spellcheck="false">VENDOR / SUPPLIER (ORDERED FROM)</span>
+            </div>
+            <div class="party-name" contenteditable="true" spellcheck="false" data-key="vendorCompany">Green Light Enterprises (GLE)</div>
+            <div class="party-line" contenteditable="true" spellcheck="false" data-key="vendorAddress">3/9A, Rita Lane, Wewala, Ja-Ela, Sri Lanka</div>
+            <div class="party-line" contenteditable="true" spellcheck="false" data-key="vendorContact">Tel: 011 224 4746 | Mob: 077 324 8520</div>
+            <div class="party-line" contenteditable="true" spellcheck="false" data-key="vendorEmail">Email: gle.triplet@gmail.com</div>
+            <div class="party-line" contenteditable="true" spellcheck="false" data-key="vendorWeb">Web: greenlightgle.com</div>
+          </div>
+
+          <!-- Ship-To (Delivery Destination) Column -->
+          <div class="party-block party-shipto" id="shipToBlock">
+            <div class="party-label-wrap">
+              <div class="party-icon-dot shipto-dot"></div>
+              <span class="party-label" contenteditable="true" spellcheck="false">SHIP TO (DELIVERY DESTINATION)</span>
+            </div>
+            <div class="party-name" contenteditable="true" spellcheck="false" data-key="shipCompany">Dilmin Central Receiving Warehouse</div>
+            <div class="party-attn" contenteditable="true" spellcheck="false" data-key="shipAttn">Dock #02 • Receiving Officer: Mr C. Pathirana</div>
+            <div class="party-line" contenteditable="true" spellcheck="false" data-key="shipAddress1">Katupotha Road, Moonamaldeniya</div>
+            <div class="party-line" contenteditable="true" spellcheck="false" data-key="shipContact">Receiving Contact: 077 412 8930</div>
+            <div class="party-line" contenteditable="true" spellcheck="false" data-key="shipHours">Unloading Hours: 08:00 AM – 05:00 PM</div>
+          </div>
+
+        </section>
+
+        <!-- 2.5 Commercial Order Logistics Strip -->
+        <section class="logistics-info-strip">
+          <div class="section-size-ctrl no-print" data-section="logistics" title="Freight & Logistics Text Size">
+            <button type="button" class="sec-ctrl-btn dec" title="කුඩා කරන්න (A-)">A-</button>
+            <span class="sec-ctrl-val">100%</span>
+            <button type="button" class="sec-ctrl-btn inc" title="විශාල කරන්න (A+)">A+</button>
+            <button type="button" class="sec-ctrl-btn reset" title="Reset">↺</button>
+          </div>
+          <div class="logistics-item">
+            <span class="logistics-label" contenteditable="true" spellcheck="false">DISPATCH / FREIGHT</span>
+            <span class="logistics-val" contenteditable="true" spellcheck="false" data-key="dispatchMethod">Lorry / Road Transport (GLE Fleet)</span>
+          </div>
+          <div class="logistics-divider"></div>
+          <div class="logistics-item">
+            <span class="logistics-label" contenteditable="true" spellcheck="false">PAYMENT TERMS</span>
+            <span class="logistics-val" contenteditable="true" spellcheck="false" data-key="paymentTerms">Net 30 Days / Direct Wire Transfer</span>
+          </div>
+          <div class="logistics-divider"></div>
+          <div class="logistics-item">
+            <span class="logistics-label" contenteditable="true" spellcheck="false">INSPECTION AT DESTINATION</span>
+            <span class="logistics-val" contenteditable="true" spellcheck="false" data-key="inspectionTerms">100% Quality & Micron Verification</span>
+          </div>
+          <div class="logistics-divider"></div>
+          <div class="logistics-item">
+            <span class="logistics-label" contenteditable="true" spellcheck="false">CURRENCY</span>
+            <span class="logistics-val" id="currencyBadgeVal" contenteditable="true" spellcheck="false">LKR (Rs.)</span>
+          </div>
+        </section>
+
+        <!-- 3. Line Items Table -->
+        <section class="po-table-container">
+          <div class="section-size-ctrl no-print" data-section="table" title="Table Items Text Size">
+            <button type="button" class="sec-ctrl-btn dec" title="කුඩා කරන්න (A-)">A-</button>
+            <span class="sec-ctrl-val">100%</span>
+            <button type="button" class="sec-ctrl-btn inc" title="විශාල කරන්න (A+)">A+</button>
+            <button type="button" class="sec-ctrl-btn reset" title="Reset">↺</button>
+          </div>
+          <table class="po-items-table" id="poTable">
+            <thead>
+              <tr>
+                <th class="col-num" contenteditable="true" spellcheck="false">#</th>
+                <th class="col-code" contenteditable="true" spellcheck="false">ITEM CODE</th>
+                <th class="col-item" contenteditable="true" spellcheck="false">ITEM DESCRIPTION & SPECIFICATIONS</th>
+                <th class="col-unit" contenteditable="true" spellcheck="false">UNIT</th>
+                <th class="col-qty" contenteditable="true" spellcheck="false">QTY ORDERED</th>
+                <th class="col-price" contenteditable="true" spellcheck="false">UNIT PRICE (RS.)</th>
+                <th class="col-amount" contenteditable="true" spellcheck="false">TOTAL AMOUNT (RS.)</th>
+                <th class="col-actions no-print"></th>
+              </tr>
+            </thead>
+            <tbody id="poTableBody">
+              <!-- Default Initial Items -->
+              <tr class="po-row">
+                <td class="col-num">1</td>
+                <td class="col-code cell-code" contenteditable="true" spellcheck="false">SF-21-500</td>
+                <td class="col-item cell-item" contenteditable="true" spellcheck="false">Stretch Film (Hand Grade • Virgin LLDPE 21m x 500mm x 300m)</td>
+                <td class="col-unit cell-unit"><span class="unit-pill" contenteditable="true" spellcheck="false">Rolls</span></td>
+                <td class="col-qty cell-qty" contenteditable="true" spellcheck="false">50</td>
+                <td class="col-price cell-price" contenteditable="true" spellcheck="false">1,850.00</td>
+                <td class="col-amount cell-amount" contenteditable="true" spellcheck="false">92,500.00</td>
+                <td class="col-actions no-print">
+                  <div class="row-actions-group">
+                    <button type="button" class="row-move-btn move-up" title="Move Up">▲</button>
+                    <button type="button" class="row-move-btn move-down" title="Move Down">▼</button>
+                    <button type="button" class="row-delete-btn" title="Delete item">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <polyline points="3 6 5 6 21 6"/>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                      </svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Table Bottom Bar (Add row action) -->
+          <div class="add-row-bar no-print">
+            <button type="button" id="addRowBtn" class="btn btn-secondary btn-sm">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              <span>Add Item Row</span>
+            </button>
+            <button type="button" id="clearRowsBtn" class="btn btn-ghost btn-sm">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>
+              <span>Clear Items</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- 4. Financial Calculations, Words, Bank Details & Purchasing Terms Grid -->
+        <section class="po-finance-grid">
+          
+          <!-- Left: Amount in Words, Bank Information & Purchasing Terms -->
+          <div class="finance-left-col">
+            <!-- Amount In Words -->
+            <div class="words-card">
+              <div class="section-size-ctrl no-print" data-section="words" title="Words Text Size">
+                <button type="button" class="sec-ctrl-btn dec" title="කුඩා කරන්න (A-)">A-</button>
+                <span class="sec-ctrl-val">100%</span>
+                <button type="button" class="sec-ctrl-btn inc" title="විශාල කරන්න (A+)">A+</button>
+                <button type="button" class="sec-ctrl-btn reset" title="Reset">↺</button>
+              </div>
+              <div class="words-card-title" contenteditable="true" spellcheck="false">TOTAL AMOUNT IN WORDS (LKR)</div>
+              <div class="words-card-text" id="amountWordsText" contenteditable="true" spellcheck="false">Sri Lankan Rupees Ninety-Two Thousand Five Hundred Only</div>
+            </div>
+
+            <!-- Bank Transfer Details (Collapsible / Toggleable) -->
+            <div class="bank-details-card" id="bankDetailsCard">
+              <div class="section-size-ctrl no-print" data-section="bank" title="Bank Details Text Size">
+                <button type="button" class="sec-ctrl-btn dec" title="කුඩා කරන්න (A-)">A-</button>
+                <span class="sec-ctrl-val">100%</span>
+                <button type="button" class="sec-ctrl-btn inc" title="විශාල කරන්න (A+)">A+</button>
+                <button type="button" class="sec-ctrl-btn reset" title="Reset">↺</button>
+              </div>
+              <div class="bank-card-header">
+                <div style="display: flex; align-items: center; gap: 5px;">
+                  <svg id="bankHeadingIcon" class="doc-heading-icon" title="Click to hide this icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+                  <span contenteditable="true" spellcheck="false">VENDOR BANK REMITTANCE ACCOUNT</span>
+                </div>
+                <span class="lankapay-badge" contenteditable="true" spellcheck="false">LankaQR / CEFTS</span>
+              </div>
+              <div class="bank-info-grid">
+                <div class="bank-info-item">
+                  <span class="bank-info-label" contenteditable="true" spellcheck="false">Bank:</span>
+                  <span class="bank-info-val" contenteditable="true" spellcheck="false" data-key="bankName">Commercial Bank of Ceylon PLC</span>
+                </div>
+                <div class="bank-info-item">
+                  <span class="bank-info-label" contenteditable="true" spellcheck="false">Account Name:</span>
+                  <span class="bank-info-val" contenteditable="true" spellcheck="false" data-key="bankAccName">Green Light Enterprises</span>
+                </div>
+                <div class="bank-info-item">
+                  <span class="bank-info-label" contenteditable="true" spellcheck="false">Account No:</span>
+                  <span class="bank-info-val highlight" contenteditable="true" spellcheck="false" data-key="bankAccNo">1000 4829 1920</span>
+                </div>
+                <div class="bank-info-item">
+                  <span class="bank-info-label" contenteditable="true" spellcheck="false">Branch & Code:</span>
+                  <span class="bank-info-val" contenteditable="true" spellcheck="false" data-key="bankBranch">Ja-Ela (Br: 048 | Bank: 7056)</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Concise Purchasing Instructions & Commercial Terms Block -->
+            <div class="po-notes-block">
+              <div class="section-size-ctrl no-print" data-section="terms" title="Terms & Instructions Text Size">
+                <button type="button" class="sec-ctrl-btn dec" title="කුඩා කරන්න (A-)">A-</button>
+                <span class="sec-ctrl-val">100%</span>
+                <button type="button" class="sec-ctrl-btn inc" title="විශාල කරන්න (A+)">A+</button>
+                <button type="button" class="sec-ctrl-btn reset" title="Reset">↺</button>
+              </div>
+              <div class="notes-heading">
+                <svg id="termsHeadingIcon" class="doc-heading-icon" title="Click to hide this icon" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                <span contenteditable="true" spellcheck="false">PURCHASE ORDER TERMS & INSTRUCTIONS</span>
+              </div>
+              <ul class="notes-list" data-key="poNotes">
+                <li contenteditable="true" spellcheck="false">Goods must conform strictly to agreed technical specifications, micron gauge, and roll length.</li>
+                <li contenteditable="true" spellcheck="false">Please quote PO Number "PO-2026-088" on all delivery notes, commercial invoices, and carton labels.</li>
+                <li contenteditable="true" spellcheck="false">Deliveries accepted Monday through Saturday between 8:00 AM and 5:00 PM with prior dispatch notice.</li>
+                <li contenteditable="true" spellcheck="false">Goods subject to warehouse receiving inspection; defective packaging rolls will be rejected at vendor's cost.</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Right: Totals Summary Block -->
+          <div class="po-summary-box">
+            <div class="section-size-ctrl no-print" data-section="totals" title="Totals Text Size">
+              <button type="button" class="sec-ctrl-btn dec" title="කුඩා කරන්න (A-)">A-</button>
+              <span class="sec-ctrl-val">100%</span>
+              <button type="button" class="sec-ctrl-btn inc" title="විශාල කරන්න (A+)">A+</button>
+              <button type="button" class="sec-ctrl-btn reset" title="Reset">↺</button>
+            </div>
+            <div class="summary-line">
+              <span class="summary-label" contenteditable="true" spellcheck="false">Order Subtotal</span>
+              <span class="summary-val" id="subtotalVal" contenteditable="true" spellcheck="false">Rs. 92,500.00</span>
+            </div>
+
+            <!-- Discount Row -->
+            <div class="summary-line discount-row" id="discountSummaryRow">
+              <span class="summary-label">
+                <span contenteditable="true" spellcheck="false">Agreed Discount</span>
+                <span class="discount-badge" id="discountBadge" contenteditable="true" spellcheck="false">0%</span>
+              </span>
+              <span class="summary-val discount-val" id="discountVal" contenteditable="true" spellcheck="false">- Rs. 0.00</span>
+            </div>
+
+            <!-- Tax / VAT Row (Configurable) -->
+            <div class="summary-line tax-row" id="taxSummaryRow" style="display: none;">
+              <span class="summary-label">
+                <span id="taxTypeTitle" contenteditable="true" spellcheck="false">Government Tax</span>
+                <span class="tax-badge" id="taxRateBadge" contenteditable="true" spellcheck="false">0%</span>
+              </span>
+              <span class="summary-val tax-val" id="taxVal" contenteditable="true" spellcheck="false">+ Rs. 0.00</span>
+            </div>
+
+            <!-- Total PO Value Card -->
+            <div class="total-due-card">
+              <div>
+                <span class="total-label" contenteditable="true" spellcheck="false">TOTAL P.O. AMOUNT</span>
+                <span class="total-terms-sub" contenteditable="true" spellcheck="false">Authorized Payable in Sri Lankan Rupees</span>
+              </div>
+              <span class="total-val" id="totalDueVal" contenteditable="true" spellcheck="false">Rs. 92,500.00</span>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- 5. Dual Authority Grid: Vendor Acknowledgement (Left 50%) + Purchasing Authority (Right 50%) -->
+        <section class="po-bottom-authority-grid">
+          <div class="section-size-ctrl no-print" data-section="signatures" title="Signatures Text Size">
+            <button type="button" class="sec-ctrl-btn dec" title="කුඩා කරන්න (A-)">A-</button>
+            <span class="sec-ctrl-val">100%</span>
+            <button type="button" class="sec-ctrl-btn inc" title="විශාල කරන්න (A+)">A+</button>
+            <button type="button" class="sec-ctrl-btn reset" title="Reset">↺</button>
+          </div>
+          
+          <!-- Left: Vendor Order Acknowledgement Card -->
+          <div class="vendor-ack-card" id="vendorAckBox">
+            <div class="ack-card-header">
+              <svg id="ackHeadingIcon" class="doc-heading-icon" title="Click to hide this icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 6L9 17l-5-5"/></svg>
+              <span contenteditable="true" spellcheck="false">VENDOR ORDER ACKNOWLEDGEMENT</span>
+            </div>
+            <p class="ack-text" contenteditable="true" spellcheck="false">We hereby accept this Purchase Order and confirm delivery of goods on or before agreed date.</p>
+            <div class="ack-fields-grid">
+              <div class="ack-field">
+                <span class="ack-field-label" contenteditable="true" spellcheck="false">Accepted By:</span>
+                <div class="ack-line-placeholder"></div>
+              </div>
+              <div class="ack-field">
+                <span class="ack-field-label" contenteditable="true" spellcheck="false">Vendor Stamp & Date:</span>
+                <div class="ack-line-placeholder"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Authorized Purchasing Authority Block & Corporate Seal -->
+          <div class="purchaser-signatory-card">
+            <div class="signatory-content">
+              <div class="closing-salute" contenteditable="true" spellcheck="false" data-key="closingSalute">For Green Light Enterprises,</div>
+              
+              <!-- Digital Signature Script -->
+              <div class="digital-signature-wrap" id="digitalSignatureWrap">
+                <div class="signature-cursive" contenteditable="true" spellcheck="false" data-key="signatureCursive">Imara Weerasinghe</div>
+              </div>
+
+              <div class="closing-name" contenteditable="true" spellcheck="false" data-key="signatoryName">Imara Weerasinghe</div>
+              <div class="closing-role" contenteditable="true" spellcheck="false" data-key="signatoryRole">Proprietor / Authorized Officer</div>
+            </div>
+
+            <!-- Official Vector Corporate Seal -->
+            <div class="official-corporate-seal" id="corporateSeal" title="Official GLE Security Seal">
+              <div class="seal-inner-circle">
+                <span class="seal-text-top" contenteditable="true" spellcheck="false">GREEN LIGHT ENTERPRISES</span>
+                <span class="seal-star" contenteditable="true" spellcheck="false">★ OFFICIAL ★</span>
+                <span class="seal-text-mid" contenteditable="true" spellcheck="false">APPROVED & ISSUED</span>
+                <span class="seal-text-bottom" contenteditable="true" spellcheck="false">SRI LANKA</span>
+              </div>
+            </div>
+          </div>
+
+        </section>
+
+      </div>
+
+      <!-- 7. Bottom Corporate Contact Footer Bar -->
+      <footer class="doc-footer-bar">
+        <div class="footer-col">
+          <div class="footer-icon-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+            </svg>
+          </div>
+          <div class="footer-col-text">
+            <span class="footer-label" contenteditable="true" spellcheck="false">PROCUREMENT HOTLINE</span>
+            <span class="footer-val" contenteditable="true" spellcheck="false" data-key="footerPhone">077 412 8930 / 011 224 4746</span>
+          </div>
+        </div>
+
+        <div class="footer-divider"></div>
+
+        <div class="footer-col">
+          <div class="footer-icon-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+              <polyline points="22,6 12,13 2,6"/>
+            </svg>
+          </div>
+          <div class="footer-col-text">
+            <span class="footer-label" contenteditable="true" spellcheck="false">OFFICIAL ENQUIRIES</span>
+            <span class="footer-val" contenteditable="true" spellcheck="false" data-key="footerEmail">dilmin.procure@gmail.com</span>
+          </div>
+        </div>
+
+        <div class="footer-divider"></div>
+
+        <div class="footer-col">
+          <div class="footer-icon-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="2" y1="12" x2="22" y2="12"/>
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+            </svg>
+          </div>
+          <div class="footer-col-text">
+            <span class="footer-label" contenteditable="true" spellcheck="false">SUPPLIER PORTAL</span>
+            <span class="footer-val" contenteditable="true" spellcheck="false" data-key="footerWebsite">greenlightgle.com</span>
+          </div>
+        </div>
+      </footer>
+
+    </article>
+  </main>
+
+  <script src="po.js"></script>
+</body>
+</html>
